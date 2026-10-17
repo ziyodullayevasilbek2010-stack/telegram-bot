@@ -2,3 +2,5 @@ aiogram
 yt-dlp
 moviepy
 moviepy
+moviepy
+imageio_ffmpeg
