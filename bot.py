@@ -1,3 +1,4 @@
+import nest_asyncio
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command
