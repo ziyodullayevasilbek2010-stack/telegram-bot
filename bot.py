@@ -181,20 +181,30 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
     output_path = "output_colored.mp4"
     
     try:
-        clip = VideoFileClip(video_path)
-        
-        # Tanlangan rang effektiga qarab ishlov berish
+        # Videoni o'qib olamiz va Modal serveriga yuboramiz
+        with open(video_path, "rb") as f:
+            video_bytes = f.read()
+
+        # Qaysi filtr tanlanganini aniqlaymiz
         if action == "color_sunset":
-            # Sunset: qizg'ish/tilla tus berish
-            processed_clip = colorx(clip, [1.2, 1.0, 0.8])
+            filter_name = "sunset"
         elif action == "color_cyber":
-            # Cyberpunk: moviy va neon tus berish
-            processed_clip = colorx(clip, [0.8, 1.1, 1.4])
+            filter_name = "cyberpunk"
         else:
-            # Cinematic: kontrast va tabiiy tus
-            processed_clip = colorx(clip, [1.1, 1.1, 1.1])
-            
-        processed_clip.write_videofile(output_path, codec="libx264", audio_codec="aac", logger=None)
+            filter_name = "cinematic"
+
+        import modal
+        # Modal orqali uzoqdagi serverda ishlov beramiz
+        process_video_remote = modal.Function.lookup("video-processor", "apply_color_filter")
+        result_bytes = process_video_remote.remote(video_bytes, filter_name)
+
+        # Natijani vaqtinchalik faylga yozamiz
+        with open(output_path, "wb") as f_out:
+            f_out.write(result_bytes)
+
+        # Natijani foydalanuvchiga yuborish
+        video_result = types.FSInputFile(output_path)
+        await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
         
         # Natijani yuborish
         video_result = types.FSInputFile(output_path)
