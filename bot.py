@@ -1,3 +1,12 @@
+import asyncio
+from aiogram import Bot, Dispatcher
+from aiogram.filters import Command
+from aiogram.types import Message
+
+# TOKEN va obyektlarni birinchi bo'lib e'lon qilamiz:
+TOKEN = "8672087286:AAGA3kjOKVkFylp6PeInqboWi29MdQnA-eU"  # tokeningizni yozasiz
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
 import sqlite3
 
 # Ma'lumotlar bazasini yaratish/ulash
