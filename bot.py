@@ -42,7 +42,6 @@ async def stat_cmd(message: Message):
         count = cursor.fetchone()[0]
         await message.answer(f"📊 Botingizdan foydalanuvchilar soni: {count} ta")
        
-
 import os
 import logging
 from aiogram import Bot, Dispatcher, types, F
