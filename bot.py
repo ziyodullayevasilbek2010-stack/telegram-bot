@@ -43,7 +43,6 @@ async def stat_cmd(message: Message):
         await message.answer(f"📊 Botingizdan foydalanuvchilar soni: {count} ta")
        
 
-nest_asyncio.apply()
 import os
 import logging
 from aiogram import Bot, Dispatcher, types, F
