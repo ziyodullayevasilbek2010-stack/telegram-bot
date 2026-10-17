@@ -4,7 +4,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 # TOKEN va obyektlarni birinchi bo'lib e'lon qilamiz:
-TOKEN = "8672087286:AAGA3kjOKVkFylp6PeInqboWi29MdQnA-eU"  # tokeningizni yozasiz
+TOKEN = "8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8"  # tokeningizni yozasiz
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 import sqlite3
@@ -58,7 +58,7 @@ from moviepy.video.fx.all import colorx
 # Loggingni sozlash
 logging.basicConfig(level=logging.INFO)
 
-API_TOKEN = '8672087286:AAGA3kjOKVkFylp6PeInqboWi29MdQnA-eU'
+API_TOKEN = '8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8'
 
 from aiogram.client.session.aiohttp import AiohttpSession
 
