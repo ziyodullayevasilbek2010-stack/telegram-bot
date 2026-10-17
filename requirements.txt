@@ -1,6 +1,4 @@
-aiogram
+aiogram>=3.0.0
 yt-dlp
-moviepy
-moviepy
-moviepy
-imageio_ffmpeg
+moviepy==1.0.3
+imageio-ffmpeg
