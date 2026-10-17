@@ -42,7 +42,7 @@ async def stat_cmd(message: Message):
         cursor.execute("SELECT COUNT(*) FROM users")
         count = cursor.fetchone()[0]
         await message.answer(f"📊 Botingizdan foydalanuvchilar soni: {count} ta")
-        import nest_asyncio
+       
 
 nest_asyncio.apply()
 import os
