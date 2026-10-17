@@ -51,7 +51,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 import yt_dlp
 from moviepy.editor import VideoFileClip, ColorClip, CompositeVideoClip
-from moviepy.video.fx.all import colorx
+
 
 # Loggingni sozlash
 logging.basicConfig(level=logging.INFO)
