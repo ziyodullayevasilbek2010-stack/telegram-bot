@@ -1,4 +1,38 @@
-import nest_asyncio
+import sqlite3
+
+# Ma'lumotlar bazasini yaratish/ulash
+conn = sqlite3.connect("users.db")
+cursor = conn.cursor()
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY
+    )
+""")
+conn.commit()
+
+
+# Har safar /start bosilganda foydalanuvchini saqlash
+@dp.message(Command("start"))
+async def start_cmd(message: Message):
+    user_id = message.from_user.id
+    cursor.execute(
+        "INSERT OR IGNORE INTO users (user_id) VALUES (?)", (user_id,)
+    )
+    conn.commit()
+    await message.answer("Xush kelibsiz! Video havolasini yuboring.")
+
+
+# Faqat admin uchun statistikani ko'rish buyrug'i
+@dp.message(Command("stat"))
+async def stat_cmd(message: Message):
+    # Faqat siz ko'ra olishingiz uchun Telegram ID ingizni kiriting
+    ADMIN_ID = M.M.G  # <--- Shu yerga o'zingizning Telegram ID ingizni yozasiz
+
+    if message.from_user.id == ADMIN_ID:
+        cursor.execute("SELECT COUNT(*) FROM users")
+        count = cursor.fetchone()[0]
+        await message.answer(f"📊 Botingizdan foydalanuvchilar soni: {count} ta")
+        import nest_asyncio
 
 nest_asyncio.apply()
 import os
@@ -181,4 +215,5 @@ async def main():
   await dp.start_polling(bot)
 
 
-await main()
+if __name__ == "__main__":
+    asyncio.run(main())
