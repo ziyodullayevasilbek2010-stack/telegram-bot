@@ -195,7 +195,7 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
 
         import modal
         # Modal orqali uzoqdagi serverda ishlov beramiz
-        process_video_remote = modal.Function.lookup("video-processor", "apply_color_filter")
+       process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
         result_bytes = process_video_remote.remote(video_bytes, filter_name)
 
         # Natijani vaqtinchalik faylga yozamiz
