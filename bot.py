@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
 # TOKEN va sozlamalar
-TOKEN = os.getenv("8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8")
+TOKEN = "8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8"
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
