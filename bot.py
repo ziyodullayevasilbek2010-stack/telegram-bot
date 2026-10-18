@@ -214,13 +214,7 @@ except Exception as e:
         if os.path.exists(video_path):
             os.remove(video_path)
         
-        # Resurslarni tozalash
-        clip.close()
-        processed_clip.close()
-        if os.path.exists(input_path): os.remove(input_path)
-        if os.path.exists(output_path): os.remove(output_path)
-        
-        await processing_msg.delete()
+       
         await state.clear()
         await callback.message.answer("Bosh menyu:", reply_markup=get_main_menu())
         
