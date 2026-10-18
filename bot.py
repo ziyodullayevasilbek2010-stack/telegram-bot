@@ -179,7 +179,7 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
     processing_msg = await callback.message.answer("⚡ Video ranglari Modal bulutida ishlanmoqda, biroz kuting...")
     output_path = "output_colored.mp4"
 
-    try:
+   try:
         # Videoni o'qiymiz
         with open(video_path, "rb") as f:
             video_bytes = f.read()
@@ -192,18 +192,16 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
         else:
             filter_name = "cinematic"
 
-        from modal_app import apply_color_filter
-result_bytes = apply_color_filter.remote(video_bytes, filter_name)
+        # Modal orqali videoni qayta ishlaymiz
+        result_bytes = apply_color_filter.remote(video_bytes, filter_name)
 
-        # Natijani saqlaymiz
         with open(output_path, "wb") as f_out:
             f_out.write(result_bytes)
 
-        # Videoni Telegram'ga yuboramiz
         video_result = types.FSInputFile(output_path)
         await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
 
-except Exception as e:
+    except Exception as e:
         await callback.message.answer(f"Videoni qayta ishlashda xatolik yuz berdi: {e}")
 
     finally:
