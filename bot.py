@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from yt_dlp import YoutubeDL
 from moviepy.editor import VideoFileClip, ColorClip, CompositeVideoClip
 
-TOKEN = "BU_YERGA_BOT_TOKENINGizNI_YOZING"
+TOKEN = "8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
