@@ -1,92 +1,99 @@
-import asyncio
 import os
+import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
+from yt_dlp import YoutubeDL
+from moviepy.editor import VideoFileClip, ColorClip, CompositeVideoClip
 
-# TOKEN va sozlamalar
-TOKEN = "8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8"
+TOKEN = "BU_YERGA_BOT_TOKENINGizNI_YOZING"
+
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-class VideoState(StatesGroup):
-    waiting_for_video = State()
-    choosing_filter = State()
-
+# 1. Start komandasi
 @dp.message(Command("start"))
-async def cmd_start(message: types.Message, state: FSMContext):
-    await state.clear()
-    await message.answer("Salom! Menga video yuboring va uni ideal tarzda rang-barang qilib beraman.")
-    await state.set_state(VideoState.waiting_for_video)
+async def start_handler(message: types.Message):
+    await message.answer(
+        "Salom! 👋\n"
+        "Menga YouTube yoki Instagram havolasini yuboring (videoni yuklab beraman) "
+        "yoki tayyor video fayl yuboring (orqa foniga rang berib beraman)."
+    )
 
-@dp.message(VideoState.waiting_for_video, lambda m: m.video is not None)
-async def handle_video(message: types.Message, state: FSMContext):
-    file_id = message.video.file_id
-    file = await bot.get_file(file_id)
-    file_path = file.file_path
+# 2. Havolalarni qabul qilish va video yuklash (YouTube, Instagram)
+@dp.message()
+async def handle_message(message: types.Message):
+    text = message.text
+    if text and (("http://" in text) or ("https://" in text)):
+        await message.answer("⏳ Video yuklab olinmoqda, biroz kuting...")
+        
+        output_template = "downloaded_video.mp4"
+        
+        ydl_opts = {
+            'format': 'best',
+            'outtmpl': output_template,
+        }
+        
+        try:
+            with YoutubeDL(ydl_opts) as ydl:
+                ydl.download([text])
+            
+            if os.path.exists(output_template):
+                video_file = types.FSInputFile(output_template)
+                await message.answer_video(video=video_file, caption="Mana siz istagan video! 📥")
+                os.remove(output_template)
+            else:
+                await message.answer("❌ Videoni yuklab bo'lmadi.")
+        except Exception as e:
+            await message.answer(f"❌ Xatolik yuz berdi: {e}")
+    else:
+        await message.answer("Iltimos, yaroqli havola yuboring yoki video fayl tashlang!")
 
-    os.makedirs("downloads", exist_ok=True)
-    video_path = f"downloads/{message.from_user.id}.mp4"
-    await bot.download_file(file_path, destination=video_path)
-
-    await state.update_data(video_path=video_path)
-
-    # Tugmalarni chiqaramiz
-    keyboard = types.InlineKeyboardMarkup(inline_keyboard=[
-        [types.InlineKeyboardButton(text="🔥 Sunset (Qizg'ish/Tilla)", callback_data="color_sunset")],
-        [types.InlineKeyboardButton(text="💎 Cyberpunk (Moviy/Neon)", callback_data="color_cyber")],
-        [types.InlineKeyboardButton(text="🌿 Cinematic (Tabiiy/Yashil)", callback_data="color_cinematic")]
-    ])
-
-    await message.answer("Ideal rang turini tanlang:", reply_markup=keyboard)
-    await state.set_state(VideoState.choosing_filter)
-
-@dp.callback_query(VideoState.choosing_filter)
-async def process_color_filter(callback: types.CallbackQuery, state: FSMContext):
-    action = callback.data
-    data = await state.get_data()
-    video_path = data.get("video_path")
-    output_path = f"downloads/output_{callback.from_user.id}.mp4"
-
-    processing_msg = await callback.message.answer("⏳ Video yuqori unumdorlikdagi bulutda qayta ishlanmoqda, biroz kuting...")
-
-    try:
-        with open(video_path, "rb") as f:
-            video_bytes = f.read()
-
-        if action == "color_sunset":
-            filter_name = "sunset"
-        elif action == "color_cyber":
-            filter_name = "cyberpunk"
-        else:
-            filter_name = "cinematic"
-
-        import modal
-        process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
-        result_bytes = process_video_remote.remote(video_bytes, filter_name)
-
-        with open(output_path, "wb") as f_out:
-            f_out.write(result_bytes)
-
-        video_result = types.FSInputFile(output_path)
-        await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
-
-    except Exception as e:
-        await callback.message.answer(f"Videoni qayta ishlashda xatolik yuz berdi: {e}")
-
-    finally:
-        await processing_msg.delete()
-        await state.clear()
-        if os.path.exists(output_path):
-            os.remove(output_path)
-        if os.path.exists(video_path):
-            os.remove(video_path)
-
+# Botni ishga tushirish
 async def main():
-    # Render ishga tushganda Modal ilovasini ham avtomatik deploy qilamiz
-    os.system("modal deploy modal_app.py")
+    print("Bot ishga tushdi...")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main()) 
+
+# Video faylni qabul qilish uchun handler
+@dp.message(lambda message: message.content_type == types.ContentType.VIDEO)
+async def handle_video_background(message: types.Message):
+    await message.answer("🎨 Videoga orqa fon rangi berilmoqda...")
+    
+    # Videoni yuklab olish
+    file_id = message.video.file_id
+    file = await bot.get_file(file_id)
+    file_path = file.file_path
+    
+    input_video = "input.mp4"
+    output_video = "output.mp4"
+    
+    await bot.download_file(file_path, input_video)
+    
+    try:
+        # MoviePy yordamida fon rangini berish (masalan: 1080x1920 Vertikal format, qora yoki chiroyli rang)
+        clip = VideoFileClip(input_video)
+        
+        # Misol uchun fon o'lchami va rangi (RGB: Masalan, To'q binafsha yoki qora)
+        bg_width, bg_height = 1080, 1920
+        background = ColorClip(size=(bg_width, bg_height), color=(20, 20, 30), duration=clip.duration)
+        
+        # Videoni markazga joylash
+        clip_resized = clip.resize(height=1200) # Videoni kichraytirib markazga qo'yish
+        final_clip = CompositeVideoClip([background, clip_resized.set_position("center")])
+        
+        final_clip.write_videofile(output_video, fps=24, codec="libx264", audio_codec="aac")
+        
+        # Yuborish
+        video_result = types.FSInputFile(output_video)
+        await message.answer_video(video=video_result, caption="✨ Mana, orqa foni yangilangan video!")
+        
+        # Fayllarni tozalash
+        clip.close()
+        final_clip.close()
+        os.remove(input_video)
+        os.remove(output_video)
+        
+    except Exception as e:
+        await message.answer(f"❌ Videoni qayta ishlashda xatolik: {e}")
