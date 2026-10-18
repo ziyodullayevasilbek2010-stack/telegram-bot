@@ -226,11 +226,42 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
         await state.clear()
         await callback.message.answer("Bosh menyu:", reply_markup=get_main_menu())
         
-    except Exception as e:
-        await processing_msg.edit_text(f"❌ Videoni qayta ishlashda xatolik yuz berdi: {str(e)}")
-        await state.clear()
+    try:
+        # Videoni o'qiymiz
+        with open(video_path, "rb") as f:
+            video_bytes = f.read()
 
-    await callback.answer()
+        # Filtr nomini aniqlaymiz
+        if action == "color_sunset":
+            filter_name = "sunset"
+        elif action == "color_cyber":
+            filter_name = "cyberpunk"
+        else:
+            filter_name = "cinematic"
+
+        import modal
+        # Modal funksiyasini chaqiramiz
+        process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
+        result_bytes = process_video_remote.remote(video_bytes, filter_name)
+
+        # Natijani saqlaymiz
+        with open(output_path, "wb") as f_out:
+            f_out.write(result_bytes)
+
+        # Videoni Telegram'ga yuboramiz
+        video_result = types.FSInputFile(output_path)
+        await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
+
+    except Exception as e:
+        await callback.message.answer(f"Videoni qayta ishlashda xatolik yuz berdi: {e}")
+
+    finally:
+        await processing_msg.delete()
+        await state.clear()
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        if os.path.exists(video_path):
+            os.remove(video_path)
 
 # Botni ishga tushirish
 import asyncio
