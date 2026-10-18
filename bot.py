@@ -192,10 +192,8 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
         else:
             filter_name = "cinematic"
 
-        import modal
-        # Modal funksiyasini chaqiramiz
-        process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
-        result_bytes = process_video_remote.remote(video_bytes, filter_name)
+        from modal_app import apply_color_filter
+result_bytes = apply_color_filter.remote(video_bytes, filter_name)
 
         # Natijani saqlaymiz
         with open(output_path, "wb") as f_out:
