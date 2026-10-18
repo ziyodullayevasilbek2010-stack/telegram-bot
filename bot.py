@@ -272,3 +272,15 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+# Botni ishga tushirish
+import asyncio
+import os
+
+async def main():
+    # Render ishga tushganda Modal ilovasini ham avtomatik deploy qilamiz:
+    os.system("modal deploy modal_app.py")
+    
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
