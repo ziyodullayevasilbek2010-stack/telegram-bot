@@ -169,23 +169,22 @@ async def receive_video_for_color(message: Message, state: FSMContext):
 async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     video_path = data.get("video_path")
-    
+
     if not video_path or not os.path.exists(video_path):
         await callback.message.answer("Xatolik! Video topilmadi. Iltimos boshidan boshlang.")
         await callback.answer()
         return
 
     action = callback.data
-    processing_msg = await callback.message.answer("🎨 Video ranglari moslashtirilmoqda, bu biroz vaqt olishi mumkin...")
-    
+    processing_msg = await callback.message.answer("⚡ Video ranglari Modal bulutida ishlanmoqda, biroz kuting...")
     output_path = "output_colored.mp4"
-    
+
     try:
-        # Videoni o'qib olamiz va Modal serveriga yuboramiz
+        # Videoni o'qiymiz
         with open(video_path, "rb") as f:
             video_bytes = f.read()
 
-        # Qaysi filtr tanlanganini aniqlaymiz
+        # Filtr nomini aniqlaymiz
         if action == "color_sunset":
             filter_name = "sunset"
         elif action == "color_cyber":
@@ -194,21 +193,28 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
             filter_name = "cinematic"
 
         import modal
-        # Modal orqali uzoqdagi serverda ishlov beramiz
-       process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
+        # Modal funksiyasini chaqiramiz
+        process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
         result_bytes = process_video_remote.remote(video_bytes, filter_name)
 
-        # Natijani vaqtinchalik faylga yozamiz
+        # Natijani saqlaymiz
         with open(output_path, "wb") as f_out:
             f_out.write(result_bytes)
 
-        # Natijani foydalanuvchiga yuborish
+        # Videoni Telegram'ga yuboramiz
         video_result = types.FSInputFile(output_path)
         await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
-        
-        # Natijani yuborish
-        video_result = types.FSInputFile(output_path)
-        await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
+
+    except Exception as e:
+        await callback.message.answer(f"Videoni qayta ishlashda xatolik yuz berdi: {e}")
+
+    finally:
+        await processing_msg.delete()
+        await state.clear()
+        if os.path.exists(output_path):
+            os.remove(output_path)
+        if os.path.exists(video_path):
+            os.remove(video_path)
         
         # Resurslarni tozalash
         clip.close()
