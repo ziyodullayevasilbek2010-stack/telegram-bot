@@ -179,11 +179,9 @@ async def apply_color_filter(callback: CallbackQuery, state: FSMContext):
     processing_msg = await callback.message.answer("⚡ Video ranglari Modal bulutida ishlanmoqda, biroz kuting...")
     output_path = "output_colored.mp4"
 try:
-        # Videoni o'qiymiz
-         with open(video_path, "rb") as f:
+        with open(video_path, "rb") as f:
             video_bytes = f.read()
 
-        # Filtr nomini aniqlaymiz
         if action == "color_sunset":
             filter_name = "sunset"
         elif action == "color_cyber":
@@ -191,7 +189,6 @@ try:
         else:
             filter_name = "cinematic"
 
-        # Modal orqali videoni qayta ishlaymiz
         result_bytes = apply_color_filter.remote(video_bytes, filter_name)
 
         with open(output_path, "wb") as f_out:
