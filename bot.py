@@ -214,10 +214,7 @@ except Exception as e:
         if os.path.exists(video_path):
             os.remove(video_path)
         
-       
-        await state.clear()
-        await callback.message.answer("Bosh menyu:", reply_markup=get_main_menu())
-        
+
     try:
         # Videoni o'qiymiz
         with open(video_path, "rb") as f:
