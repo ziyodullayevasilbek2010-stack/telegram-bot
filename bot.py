@@ -148,7 +148,7 @@ async def download_video_process(message: Message, state: FSMContext):
 # --- 2. VIDEOGA RANG BERISH QISMI ---
 @dp.callback_query(F.data == "change_bg")
 async def start_color_change(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer("Iltimos, rangini o'zgartirmoqchi bo'lgan **videongizni ** yuboring:")
+    await callback.message.answer("Iltimos, rangini o'zgartirmoqchi bo'lgan videongizni yuboring:")
     await state.set_state(BotState.waiting_for_background_video)
     await callback.answer()
 
@@ -203,7 +203,7 @@ result_bytes = apply_color_filter.remote(video_bytes, filter_name)
         video_result = types.FSInputFile(output_path)
         await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
 
-    except Exception as e:
+except Exception as e:
         await callback.message.answer(f"Videoni qayta ishlashda xatolik yuz berdi: {e}")
 
     finally:
