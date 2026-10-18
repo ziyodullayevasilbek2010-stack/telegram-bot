@@ -229,15 +229,12 @@ except Exception as e:
             filter_name = "cinematic"
 
         import modal
-        # Modal funksiyasini chaqiramiz
         process_video_remote = modal.Function.from_name("video-processor", "apply_color_filter")
         result_bytes = process_video_remote.remote(video_bytes, filter_name)
 
-        # Natijani saqlaymiz
         with open(output_path, "wb") as f_out:
             f_out.write(result_bytes)
 
-        # Videoni Telegram'ga yuboramiz
         video_result = types.FSInputFile(output_path)
         await callback.message.answer_video(video_result, caption="✨ Mana, ideal rang berilgan video tayyor!")
 
@@ -251,16 +248,6 @@ except Exception as e:
             os.remove(output_path)
         if os.path.exists(video_path):
             os.remove(video_path)
-
-# Botni ishga tushirish
-import asyncio
-
-async def main():
-  await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
 # Botni ishga tushirish
 import asyncio
 import os
