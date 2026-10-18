@@ -3,25 +3,20 @@ import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from yt_dlp import YoutubeDL
-from moviepy.editor import VideoFileClip, ColorClip, CompositeVideoClip
 from aiohttp import web
 
-# BOT TOKENINI SHU YERGA (O'RTAGA QUOTES (" ") ICHIGA) YOZING:
-TOKEN = "8672087286:AAHemPB_MZ1e2Nxs1NjbdWeJOFDNYW9bUI8"
+TOKEN = "8672087286:AAHemPB_MZ1eNxs1NjbdWeJOFDNYW9bUI8"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# 1. Start komandasi
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
     await message.answer(
         "Salom! 👋\n"
-        "Menga YouTube yoki Instagram havolasini yuboring (videoni yuklab beraman) "
-        "yoki tayyor video fayl yuboring (orqa foniga rang berib beraman)."
+        "Menga YouTube yoki Instagram havolasini yuboring, videoni yuklab beraman!"
     )
 
-# 2. Havolalarni qabul qilish va video yuklash
 @dp.message()
 async def handle_message(message: types.Message):
     text = message.text
@@ -44,12 +39,10 @@ async def handle_message(message: types.Message):
         except Exception as e:
             await message.answer(f"❌ Xatolik yuz berdi: {e}")
 
-# Render uchun soxta veb-server (Render tekin rejimda o'chirmasligi uchun)
 async def handle_http(request):
     return web.Response(text="Bot ishlayapti!")
 
 async def main():
-    # Aiohttp veb-serverini ishga tushirish (Render talab qiladi)
     app = web.Application()
     app.router.add_get("/", handle_http)
     runner = web.AppRunner(app)
