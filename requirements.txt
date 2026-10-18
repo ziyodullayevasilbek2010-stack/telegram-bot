@@ -1,1 +1,3 @@
-pip install aiogram yt-dlp moviepy
+aiogram
+yt-dlp
+moviepy
